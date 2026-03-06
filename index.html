@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partcraft</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <div class="topbar">
+        <div class="logo">partcraft <span>v0.0.48</span></div>
+        <div class="topbar-spacer"></div>
+        <div class="dim-tabs" id="dim-tabs">
+            <button class="dim-btn active" data-level="0">Off</button>
+            <button class="dim-btn" data-level="1">L1</button>
+            <button class="dim-btn" data-level="2">L2</button>
+            <button class="dim-btn" data-level="3">L3</button>
+        </div>
+        <button class="btn-icon" id="btn-new" title="New file">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3.5 7h7M7 3.5v7"/></svg>
+        </button>
+    </div>
+
+    <div class="main">
+        <div class="upload-area disabled" id="upload-area">
+            <div class="upload-box">
+                <svg class="upload-icon" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 24V12m0 0l-4.5 4.5M18 12l4.5 4.5"/>
+                    <path d="M5 26v1.5a3 3 0 003 3h20a3 3 0 003-3V26"/>
+                </svg>
+                <div class="upload-label">Drop a STEP file here</div>
+                <div class="upload-hint">.stp or .step</div>
+                <input type="file" id="file-input" accept=".stp,.step">
+            </div>
+        </div>
+
+        <div class="workspace" id="workspace">
+            <canvas class="sheet-canvas" id="sheet-canvas"></canvas>
+
+            <!-- Properties panel -->
+            <div class="props-panel" id="props-panel">
+                <div class="props-scroll">
+
+                    <!-- Drawing -->
+                    <div class="props-section">
+                        <div class="props-section-title">Drawing</div>
+                        <label class="props-field">
+                            <span>Title</span>
+                            <input type="text" id="prop-drawing-title" data-field="drawingTitle">
+                        </label>
+                        <label class="props-field">
+                            <span>Number</span>
+                            <input type="text" id="prop-drawing-no" data-field="drawingNo">
+                        </label>
+                    </div>
+
+                    <!-- Company -->
+                    <div class="props-section">
+                        <div class="props-section-title">Company</div>
+                        <label class="props-field">
+                            <span>Name</span>
+                            <input type="text" id="prop-company-name" data-field="companyName">
+                        </label>
+                        <label class="props-field">
+                            <span>Logo</span>
+                            <div class="props-file-row">
+                                <span class="props-file-name" id="logo-file-name">CREATIVE-LOGO.png</span>
+                                <button class="props-file-btn" id="btn-change-logo">Change</button>
+                                <input type="file" id="logo-input" accept="image/*" style="display:none">
+                            </div>
+                        </label>
+                        <label class="props-field">
+                            <span>Address</span>
+                            <textarea id="prop-address" data-field="address" rows="2"></textarea>
+                        </label>
+                        <label class="props-field">
+                            <span>Contact Name</span>
+                            <input type="text" id="prop-contact-name" data-field="contactName">
+                        </label>
+                        <label class="props-field">
+                            <span>Contact Email</span>
+                            <input type="text" id="prop-contact-email" data-field="contactEmail">
+                        </label>
+                        <label class="props-field">
+                            <span>Contact Phone</span>
+                            <input type="text" id="prop-contact-phone" data-field="contactPhone">
+                        </label>
+                    </div>
+
+                    <!-- Project -->
+                    <div class="props-section">
+                        <div class="props-section-title">Project</div>
+                        <label class="props-field">
+                            <span>Project Name</span>
+                            <input type="text" id="prop-project-name" data-field="projectName">
+                        </label>
+                        <label class="props-field">
+                            <span>Project Type</span>
+                            <input type="text" id="prop-project-type" data-field="projectType">
+                        </label>
+                        <label class="props-field">
+                            <span>Project Address</span>
+                            <textarea id="prop-project-address" data-field="projectAddress" rows="2"></textarea>
+                        </label>
+                    </div>
+
+                    <!-- Issue -->
+                    <div class="props-section">
+                        <div class="props-section-title">Drawing Issue</div>
+                        <label class="props-field">
+                            <span>Issue No.</span>
+                            <input type="text" id="prop-issue-no" data-field="issueNo">
+                        </label>
+                        <label class="props-field">
+                            <span>Description</span>
+                            <input type="text" id="prop-issue-desc" data-field="issueDesc">
+                        </label>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="statusbar">
+        <span id="status">Initializing…</span>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/occt-import-js@0.0.23/dist/occt-import-js.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
