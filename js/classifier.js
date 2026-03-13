@@ -57,10 +57,6 @@ export function circleFrom3Points(A, B, C) {
     return { center: center3D, radius, normal: unitNormal };
 }
 
-export function pointOnCircle(point, center, radius, tolerance) {
-    return Math.abs(v3dist(point, center) - radius) <= tolerance;
-}
-
 function isClosed(points) {
     if (points.length < 3) return false;
     return v3dist(points[0], points[points.length - 1]) < 0.05;

@@ -10,7 +10,7 @@ import { CURVE_COLORS } from './state.js';
 
 // ---- Raw edge extraction from Three.js ----
 
-export function getEdgesFromThreeJS(geometry) {
+function getEdgesFromThreeJS(geometry) {
     const edgesGeometry = new THREE.EdgesGeometry(geometry, 30);
     const positions = edgesGeometry.attributes.position.array;
     const edges = [];
@@ -23,7 +23,7 @@ export function getEdgesFromThreeJS(geometry) {
     return edges;
 }
 
-export function getAllMeshEdges(geometry) {
+function getAllMeshEdges(geometry) {
     const wireframeGeom = new THREE.WireframeGeometry(geometry);
     const positions = wireframeGeom.attributes.position.array;
     const edges = [];
@@ -38,7 +38,7 @@ export function getAllMeshEdges(geometry) {
 
 // ---- Edge chaining ----
 
-export function chainEdges(edges) {
+function chainEdges(edges) {
     const tolerance = 0.001;
     const used = new Array(edges.length).fill(false);
     const rawChains = [];
@@ -112,7 +112,7 @@ export function chainEdges(edges) {
 
 // ---- Corner detection ----
 
-export function findCorners(chain, angleThreshold = 15, lengthThreshold = 0.5) {
+function findCorners(chain, angleThreshold = 15, lengthThreshold = 0.5) {
     const corners = [];
     if (chain.length < 3) return corners;
 
@@ -150,7 +150,7 @@ export function findCorners(chain, angleThreshold = 15, lengthThreshold = 0.5) {
     return [...new Set(corners)].sort((a, b) => a - b);
 }
 
-export function splitAtCorners(chain, cornerIndices) {
+function splitAtCorners(chain, cornerIndices) {
     const result = [];
     const sorted = [...cornerIndices].sort((a, b) => a - b);
     let start = 0;

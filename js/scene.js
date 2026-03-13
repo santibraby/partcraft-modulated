@@ -1,5 +1,20 @@
 // ============================================
 // Partcraft – Three.js Scene (off-screen)
+//
+// Camera is FIXED: looks down -Z at XY plane.
+// Model is ROTATED for each view:
+//
+//   Sheet layout:
+//   ┌──────────┬──────────┐
+//   │  axon    │  front   │
+//   ├──────────┼──────────┤
+//   │  right   │  top     │
+//   └──────────┴──────────┘
+//
+//   top:   no rotation (XY plane as-is)
+//   front: rotated to show front elevation (XZ plane)
+//   right: rotated to show right elevation (YZ plane)
+//   axon:  isometric rotation
 // ============================================
 
 import * as S from './state.js';
@@ -9,13 +24,17 @@ const CAP_H = 1800;
 
 export function initThreeJS() {
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xffffff);
+    scene.background = null; // transparent — alpha composited in preview
 
     const aspect = CAP_W / CAP_H;
     const orthoCamera = new THREE.OrthographicCamera(-50 * aspect, 50 * aspect, 50, -50, 0.1, 10000);
-    orthoCamera.position.set(50, 50, 50);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+    const renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        preserveDrawingBuffer: true,
+        alpha: true,   // enable transparent background
+    });
+    renderer.setClearColor(0x000000, 0); // fully transparent clear
     renderer.setSize(CAP_W, CAP_H);
     renderer.setPixelRatio(1);
 
@@ -26,29 +45,6 @@ export function initThreeJS() {
     S.setScene(scene);
     S.setOrthoCamera(orthoCamera);
     S.setRenderer(renderer);
-}
-
-function positionCamera(viewName) {
-    const mc = S.modelCenter;
-    const d = S.modelSize * 2;
-    const aspect = CAP_W / CAP_H;
-    const fs = S.modelSize * 0.7;
-
-    S.orthoCamera.left   = -fs * aspect;
-    S.orthoCamera.right  =  fs * aspect;
-    S.orthoCamera.top    =  fs;
-    S.orthoCamera.bottom = -fs;
-    S.orthoCamera.updateProjectionMatrix();
-
-    switch (viewName) {
-        case 'top':   S.orthoCamera.position.set(mc.x, mc.y + d, mc.z); S.orthoCamera.up.set(0, 0, -1); break;
-        case 'front': S.orthoCamera.position.set(mc.x, mc.y, mc.z + d); S.orthoCamera.up.set(0, 1, 0); break;
-        case 'right': S.orthoCamera.position.set(mc.x + d, mc.y, mc.z); S.orthoCamera.up.set(0, 1, 0); break;
-        case 'axon':
-            S.orthoCamera.position.set(mc.x + d, mc.y + d, mc.z + d);
-            S.orthoCamera.up.set(0, 1, 0); break;
-    }
-    S.orthoCamera.lookAt(mc);
 }
 
 export function fitCameraToObject(object) {
@@ -63,15 +59,74 @@ export function fitCameraToObject(object) {
     });
 }
 
-/** Capture all 4 views, return { axon, top, right, front } data URLs */
+// ── View rotations (Euler angles applied to model around its center) ──
+
+const VIEW_ROTATIONS = {
+    front: { x: -Math.PI / 2, y: Math.PI / 2,  z: Math.PI / 2 },
+    top:   { x: 0,             y: 0,            z: 0 },
+    right: { x: 0,             y: Math.PI / 2,  z: Math.PI },
+    axon:  { x: -Math.atan(1 / Math.sqrt(2)), y: Math.PI / 4, z: 165 * Math.PI / 180 },
+};
+
+function setupCamera() {
+    const mc = S.modelCenter;
+    const d = S.modelSize * 2;
+    const aspect = CAP_W / CAP_H;
+    const fs = S.modelSize * 0.7;
+
+    S.orthoCamera.left   = -fs * aspect;
+    S.orthoCamera.right  =  fs * aspect;
+    S.orthoCamera.top    =  fs;
+    S.orthoCamera.bottom = -fs;
+    S.orthoCamera.updateProjectionMatrix();
+
+    // Fixed: looking down -Z at XY plane
+    S.orthoCamera.position.set(mc.x, mc.y, mc.z + d);
+    S.orthoCamera.up.set(0, 1, 0);
+    S.orthoCamera.lookAt(mc);
+}
+
+/** Capture all 4 views by rotating model, return data URLs (transparent bg) */
 export function captureAllViews() {
-    const views = ['axon', 'top', 'right', 'front'];
+    const group = S.currentGroup;
+    if (!group) return {};
+
+    const mc = S.modelCenter;
     const captures = {};
-    for (const v of views) {
-        positionCamera(v);
+
+    // Save original
+    const origPos = group.position.clone();
+    const origRot = group.rotation.clone();
+
+    for (const v of ['axon', 'top', 'right', 'front']) {
+        setupCamera();
+
+        // Reset
+        group.position.copy(origPos);
+        group.rotation.set(0, 0, 0);
+
+        // Rotate around model center using a pivot
+        const rot = VIEW_ROTATIONS[v];
+        const pivot = new THREE.Group();
+        pivot.position.copy(mc);
+        pivot.rotation.set(rot.x, rot.y, rot.z, 'YXZ');
+
+        S.scene.remove(group);
+        group.position.sub(mc);
+        pivot.add(group);
+        S.scene.add(pivot);
+
         S.renderer.render(S.scene, S.orthoCamera);
         captures[v] = S.renderer.domElement.toDataURL('image/png');
+
+        // Restore
+        pivot.remove(group);
+        S.scene.remove(pivot);
+        group.position.copy(origPos);
+        group.rotation.copy(origRot);
+        S.scene.add(group);
     }
+
     S.setCaptures(captures);
     return captures;
 }

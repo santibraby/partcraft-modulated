@@ -1,3 +1,5 @@
 @echo off
-title Partcraft Dev Server
-python app.py
+title Partcraft v0.0.49
+cd /d "%~dp0"
+npm run dev
+pause

@@ -83,8 +83,8 @@ export function getViewExtents(viewName) {
     if (!S.modelBounds) return { horizontal: 1, vertical: 1 };
     const b = S.modelBounds;
     switch (viewName) {
-        case 'front': return { horizontal: b.max.x - b.min.x, vertical: b.max.y - b.min.y };
-        case 'top':   return { horizontal: b.max.x - b.min.x, vertical: b.max.z - b.min.z };
+        case 'front': return { horizontal: b.max.x - b.min.x, vertical: b.max.z - b.min.z };
+        case 'top':   return { horizontal: b.max.x - b.min.x, vertical: b.max.y - b.min.y };
         case 'right': return { horizontal: b.max.z - b.min.z, vertical: b.max.y - b.min.y };
         case 'axon': {
             const dx = b.max.x - b.min.x, dy = b.max.y - b.min.y, dz = b.max.z - b.min.z;
@@ -97,7 +97,7 @@ export function getViewExtents(viewName) {
 function calcScale(vp) {
     const ext = getViewExtents(vp.view);
     if (ext.horizontal === 0 && ext.vertical === 0) return 1;
-    return Math.min(vp.width / Math.max(ext.horizontal, 0.01), vp.height / Math.max(ext.vertical, 0.01)) * 0.75;
+    return Math.min(vp.width / Math.max(ext.horizontal, 0.01), vp.height / Math.max(ext.vertical, 0.01)) * 0.375;
 }
 
 function fmtScale(s) {

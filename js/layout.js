@@ -56,15 +56,15 @@ export const LAYOUT = {
 
         // [row][col] → view name. Row 0=top, Col 0=left
         views: [
-            ['axon',  'top'  ],
-            ['right', 'front'],
+            ['axon',  'front'],
+            ['right', 'top'  ],
         ],
 
         labels: {
-            axon:  '3D Isometric View',
-            top:   'Plan View',
-            right: 'Section / Elevation',
-            front: 'Detail View',
+            axon:  'Isometric View',
+            front: 'Front View',
+            right: 'Right View',
+            top:   'Top View',
         },
     },
 
@@ -87,7 +87,7 @@ export const LAYOUT = {
         },
 
         company: {
-            name: 'Forma Rosa Creative',
+            name: 'Forma Rosa Technologies',
             letterSpacing: 0.067,   // 2px / 30
             padding: 0.200,         // 6px / 30 top/bottom
         },
